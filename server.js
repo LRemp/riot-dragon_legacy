@@ -21,7 +21,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 const playerRouter = require('./routes/player');
+const indexRouter = require('./routes/index');
 
+app.use('/', indexRouter);
 app.use('/player', playerRouter);
 
 app.get('*', (req, res) => {
