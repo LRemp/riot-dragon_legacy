@@ -12,7 +12,7 @@ function App() {
     <Router>
       <Navigation />
       <Route path="/" exact component={Home}/>
-      <Route path="/player/:id" component={PlayerProfile}/>
+      <Route path="/player/:region/:playerid" component={PlayerProfile}/>
     </Router>
   );
 }

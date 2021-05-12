@@ -10,7 +10,7 @@ function Home() {
         <div className="home">
             <form className="search">
                 <input onChange={e => updateSearchName(e.target.value)}></input>
-                <Link to={`/player/${playerName}`}>
+                <Link to={`/player/euw/${playerName}/`}>
                     <button>Search</button>
                 </Link>
             </form>
