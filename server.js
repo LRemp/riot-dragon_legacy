@@ -21,10 +21,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 const playerRouter = require('./routes/player');
-const testRouter = require('./routes/test');
 
 app.use('/player', playerRouter);
-app.use('/test', testRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
