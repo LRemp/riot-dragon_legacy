@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
@@ -17,12 +18,17 @@ connection.once('open', () => {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 const playerRouter = require('./routes/player');
 const testRouter = require('./routes/test');
 
 app.use('/player', playerRouter);
 app.use('/test', testRouter);
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
