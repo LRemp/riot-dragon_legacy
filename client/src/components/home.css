@@ -1,0 +1,31 @@
+.home {
+    height: 95vh;
+    top: 0;
+    opacity: 0.7;
+}
+
+.search {
+    background-color: antiquewhite;
+    width: 20vw;
+    height: 2rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: relative;
+    display: flex;
+}
+
+input {
+    margin-left: 1.5%;
+    border: 0;
+    height: 95%;
+    width: 85%;
+    background-color: antiquewhite;
+}
+button {
+    height: 100%;
+}
+
+input:focus, input:focus{
+    outline: none;
+}
