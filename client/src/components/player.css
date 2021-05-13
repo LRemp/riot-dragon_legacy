@@ -1,0 +1,67 @@
+
+.player-profile-header {
+    display: flex;
+    margin-top: 30px;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 50%;
+    height: 13vw;
+    -webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 6px 6px 10px -5px rgba(0,0,0,0.75);
+    background-color: white;
+}
+
+.profile-icon-container {
+    margin: 1.5vw;
+    position: relative;
+    background-image: url("http://ddragon.leagueoflegends.com/cdn/11.10.1/img/profileicon/685.png");
+    background-repeat: no-repeat;
+
+    background-size: contain;
+    width: 10vw;
+    height: 10vw;
+    border-radius: 5vw;
+}
+
+.profile-level {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    bottom: -12%;
+    padding: 0.2vw;
+    padding-top: 0.1vw;
+    border-radius: 5px;
+    background-color: white;
+    -webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+}
+
+.profile-loading {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+}
+
+.loader {
+    border: 16px solid white;
+    border-radius: 50%;
+    border-top: 16px solid lightcoral;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

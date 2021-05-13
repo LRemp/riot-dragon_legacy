@@ -12,7 +12,7 @@ router.get('/api', function(req, res, next) {
 
 router.post('/api/player', async function(req, res, next) {
 
-  const username = req.body.username;
+  const username = req.body.player;
 
 	var region;
 	if(req.body.region == "eune"){
@@ -23,10 +23,12 @@ router.post('/api/player', async function(req, res, next) {
 		region = "ru";
 	}
 
+	console.log(username);
 	var user = await API.getInitialProfileData(username, region);
-  console.log(user);
-/*
-	var data = await getSummonerData(user, region);
+	console.log(user);
+	var data = await API.getSummonerData(user, region);
+	console.log(data);
+	/*
 	if(data == 'empty'){
 		res.render('error', {
 			matchesData,
@@ -38,10 +40,11 @@ router.post('/api/player', async function(req, res, next) {
 	}
   
 	var matchesData = await fetchSummonerMatches(user.id);*/
-
-  console.log('got player request');
-  console.log(req.body.player);
-  res.json({ title: 'Express' });
+	console.log(user.profileIconId);
+	res.json({
+		user: user,
+		data: data
+	})
 });
 
 module.exports = router;
