@@ -46,6 +46,29 @@
     left: 50%;
 }
 
+.player-ranks {
+    position:absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    right: 5%;
+}
+
+.rank-box {
+    display: flex;
+    line-height: 1;
+    padding: 20px;
+}
+
+.rank-header {
+    font-size: 11px;
+    color: #879292;
+}
+
+.rank-lower-text {
+    font-size: 12px;
+    color: #879292;
+}
+
 .loader {
     border: 16px solid white;
     border-radius: 50%;

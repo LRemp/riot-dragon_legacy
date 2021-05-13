@@ -25,6 +25,7 @@ const indexRouter = require('./routes/index');
 
 app.use('/', indexRouter);
 app.use('/player', playerRouter);
+app.use('/images', express.static('images'));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
