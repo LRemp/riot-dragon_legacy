@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './player.css';
 import { Link } from 'react-router-dom';
+import MatchList from './PlayerComponents/matchList';
+import Match from './PlayerComponents/match';
 
 function PlayerProfile({ match }) {
     
@@ -41,7 +43,7 @@ function PlayerProfile({ match }) {
             <div class="loader"></div>
         </div>
             : 
-        <div>
+        <div className="player-profile-container">
             <div className="player-profile-header">
                 <div className="profile-icon-container" style={profileIconStyle}>
                     <span className="profile-level">{playerData.user.summonerLevel}</span>
@@ -68,6 +70,11 @@ function PlayerProfile({ match }) {
                     </div>
                 </div>
             </div>
+            <MatchList>
+                {playerData.matches.map((match) =>(
+                    <Match data={match} />
+                ))}
+            </MatchList>
         </div>
         )
     );

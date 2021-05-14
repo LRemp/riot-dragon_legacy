@@ -1,0 +1,108 @@
+.Defeat {
+    background-color: rgb(255, 101, 101);
+}
+
+.Victory {
+    background-color: rgb(102, 211, 102);
+}
+
+.match {
+    display: table;
+    margin-top: 5px;
+    width: 900px;
+    height: 75px;
+}
+
+.bar {
+    display: block;
+    width: 27px;
+    background: grey;
+    margin: 5px auto;
+    height: 2px;
+}
+
+.champion-data {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 0;
+    width: 118px;
+}
+
+.champion-block {
+    display: flex;
+    justify-content: center;
+}
+
+.champion {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.champion-image {
+    width: 46px;
+    height: 46px;
+    margin-top: 2px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.summoner-spells {
+    display: block;
+}
+
+.summoner-spell {
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.summoner-runes {
+    display: block;
+}
+
+.rune-type {
+    display: block;
+    background: #000;
+    border-radius: 50%;
+    margin-top: 2px;
+    width: 22px;
+    height: 22px;
+    overflow: hidden;
+}
+
+.KDA {
+    display: table-cell;
+    text-align: center;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.stats {
+    display: table-cell;
+    text-align: center;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.champion-name {
+    font-size: 11px;
+}
+
+.items {
+    font-size: 0;
+}
+
+.item {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 3px;
+    background: grey;
+    margin-top: 2px;
+    margin-right: 2px;
+    overflow: hidden;
+}

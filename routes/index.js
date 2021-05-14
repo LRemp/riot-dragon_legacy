@@ -23,27 +23,19 @@ router.post('/api/player', async function(req, res, next) {
 		region = "ru";
 	}
 
-	console.log(username);
 	var user = await API.getInitialProfileData(username, region);
-	console.log(user);
 	var data = await API.getSummonerData(user, region);
-	console.log(data);
-	/*
+
 	if(data == 'empty'){
-		res.render('error', {
-			matchesData,
-			data,
-			user,
-			style: "error.css"
-		})
+		//handle exception over here
 		return;
 	}
   
-	var matchesData = await fetchSummonerMatches(user.id);*/
-	console.log(user.profileIconId);
+	var matchesData = await API.updatePlayerMatches(user, region);
 	res.json({
 		user: user,
-		data: data
+		data: data,
+		matches: matchesData
 	})
 });
 
