@@ -92,6 +92,7 @@ async function fetchMatches(user, region) {
 async function updatePlayerMatches(user, region) {
 	var matches = await fetchMatches(user, region);
 	var matchesData = [];
+	var matchPromises = [];
 	for(var i = 0; i < 10; i++){
 		var gameId = matches[i].gameId;
 		var URL = `https://${region}.api.riotgames.com/lol/match/v4/matches/${gameId}?api_key=${process.env.API_KEY}`;
@@ -99,8 +100,10 @@ async function updatePlayerMatches(user, region) {
 		var championsData = [];
 		var players = {};
 		console.log(`fetching match ${i}`);
-		await new Promise(function(resolve, reject){
+		let index = i;
+		matchPromises.push(new Promise(function(resolve, reject){
 			request(URL, async function(err, response, body) {
+				var match = {};
 				if(!err && response.statusCode == 200) {
 					var json = JSON.parse(body);
 					matchData = json;
@@ -110,30 +113,28 @@ async function updatePlayerMatches(user, region) {
 						var data2 = matchData.participants[item].stats;
 						var data3 = matchData.participants[item];
 
-				
-						if(matchData.participants[item].championId == matches[i].champion){
+						if(matchData.participants[item].championId == matches[index].champion){
 							playerData.level = data2.champLevel;
 							playerData.kills = data2.kills;
 							playerData.deaths = data2.deaths;
 							playerData.assists = data2.assists;
-							playerData.perkPrimaryName = await getPerkName(data2.perk0, data2.perkPrimaryStyle);
-							playerData.perkSubStyleName = await getPerkStyleName(data2.perkSubStyle);
-							playerData.spell1ID = await getSummonerSpellName(matchData.participants[item].spell1Id);
-							playerData.spell2ID = await getSummonerSpellName(matchData.participants[item].spell2Id);
+							playerData.perkPrimaryName = getPerkName(data2.perk0, data2.perkPrimaryStyle);
+							playerData.perkSubStyleName = getPerkStyleName(data2.perkSubStyle);
+							playerData.spell1ID = getSummonerSpellName(matchData.participants[item].spell1Id);
+							playerData.spell2ID = getSummonerSpellName(matchData.participants[item].spell2Id);
 							playerData.cs = data2.totalMinionsKilled + data2.neutralMinionsKilled;
 							if(data2.win == true){
 								playerData.result = "Victory";
 							} else {
 								playerData.result = "Defeat";
 							}
-							playerData.itemLinks = {};
-							playerData.itemLinks[0] = await getItemName(data2.item0);
-							playerData.itemLinks[1] = await getItemName(data2.item1);
-							playerData.itemLinks[2] = await getItemName(data2.item2);
-							playerData.itemLinks[3] = await getItemName(data2.item3);
-							playerData.itemLinks[4] = await getItemName(data2.item4);
-							playerData.itemLinks[5] = await getItemName(data2.item5);
-							playerData.itemLinks[6] = await getItemName(data2.item6);
+							var itemLinks = [];
+							for(let i = 0; i < 7; i++){
+								itemLinks.push(new Promise((resolve, reject) => {
+									resolve(getItemName(data2["item"+i]))
+								}))
+							}
+							playerData.itemLinks = await Promise.all(itemLinks);
 						}
 						if (matchData.queueId == 430){
 							matchData.matchType = "Normal";
@@ -177,229 +178,117 @@ async function updatePlayerMatches(user, region) {
 						championData = ({ championName: championName, championId: matchData.participants[item].championId});
 						championsData.push(championData);
 					}
-					var championName = await getChampionName(matches[i].champion);
-					championData = ({ championName: championName, championId: matches[i].champion});
+					var championName = getChampionName(matches[index].champion);
+					championData = ({ championName: championName, championId: matches[index].champion});
 					playerData.championData = championData;
 					var obj = {championsData: championsData, matchData: matchData, playerData: playerData, players: players};
-					matchesData.push(obj);
+					match = obj;
 				} else {
 					console.log(response.statusCode);
 				}
-				resolve('finished');
+				resolve(match)
 			});
-		})
-		/*await rp(URL)
-				.then(function (body) {
-						var json = JSON.parse(body);
-						matchData = json;
-				})
-				.then(function(matchDatas) {
-						var playerData = {};
-						for(var item in matchData.participants) {
-							var data = matchData.participants[item].timeline;
-							var data2 = matchData.participants[item].stats;
-							var data3 = matchData.participants[item];
-
-					
-							if(matchData.participants[item].championId == matches[i].champion){
-								playerData.level = data2.champLevel;
-								playerData.kills = data2.kills;
-								playerData.deaths = data2.deaths;
-								playerData.assists = data2.assists;
-								playerData.perkPrimaryName = getPerkName(data2.perk0, data2.perkPrimaryStyle);
-								playerData.perkSubStyleName = getPerkStyleName(data2.perkSubStyle);
-								playerData.spell1ID = getSummonerSpellName(matchData.participants[item].spell1Id);
-								playerData.spell2ID = getSummonerSpellName(matchData.participants[item].spell2Id);
-								playerData.cs = data2.totalMinionsKilled + data2.neutralMinionsKilled;
-								if(data2.win == true){
-									playerData.result = "Victory";
-								} else {
-									playerData.result = "Defeat";
-								}
-								playerData.itemLinks = {};
-								playerData.itemLinks[0] = getItemName(data2.item0);
-								playerData.itemLinks[1] = getItemName(data2.item1);
-								playerData.itemLinks[2] = getItemName(data2.item2);
-								playerData.itemLinks[3] = getItemName(data2.item3);
-								playerData.itemLinks[4] = getItemName(data2.item4);
-								playerData.itemLinks[5] = getItemName(data2.item5);
-								playerData.itemLinks[6] = getItemName(data2.item6);
-							}
-							if (matchData.queueId == 430){
-								matchData.matchType = "Normal";
-							} else if(matchData.queueId == 420){
-								matchData.matchType = "Ranked Solo";
-							} else if(matchData.gameMode == "URF"){
-								matchData.matchType = "URF";
-							}
-
-							if(data3.teamId == 100){
-								if(data.lane == 'BOTTOM'){
-									if(data.role == 'DUO_SUPPORT'){
-
-
-									} else if(data.role == 'DUO_CARRY'){
-
-									}
-								} else if(data.lane == 'JUNGLE'){
-
-								} else if(data.lane == 'MIDDLE'){
-
-								} else if(data.lane == 'TOP'){
-
-								}
-							} else if(data3.teamId == 200){
-								if(data.lane == 'BOTTOM'){
-									if(data.role == 'DUO_SUPPORT'){
-
-									} else if(data.role == 'DUO_CARRY'){
-
-									}
-								} else if(data.lane == 'JUNGLE'){
-
-								} else if(data.lane == 'MIDDLE'){
-
-								} else if(data.lane == 'TOP'){
-
-								}
-							}
-
-							championData = ({ championName: championName, championId: matchData.participants[item].championId});
-							championsData.push(championData);
-						}
-						var championName = getChampionName(matches[i].champion);
-						championData = ({ championName: championName, championId: matches[i].champion});
-						playerData.championData = championData;
-						var obj = {championsData: championsData, matchData: matchData, playerData: playerData, players: players};
-						matchesData.push(obj);
-				})
-				.catch(function (err) {
-					console.log(err);
-				});*/
+		}))
 	}
-	return matchesData;
+	const data = await Promise.all(matchPromises)
+	return data;
 }
 
-async function getPerkName(perkID, perkStyle) {
-	//http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json
-	var name = "none";
-	var URL = `http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json`;
-	await new Promise(function(resolve, reject){
-		request(URL, function(err, response, body) {
-			if(!err && response.statusCode == 200) {
-				var data = JSON.parse(body);
-				for(var item in data){
-					if(data[item].id == perkStyle){
-						var data2 = data[item].slots;
-						for(var index in data2){
-							var data3 = data2[index].runes;
-							for(var index2 in data3){
-								if(data3[index2].id == perkID){
-									name = data3[index2].icon;
-									resolve('finished');
-								}
-							}
-						}
+function getPerkName(perkID, perkStyle) {
+	for(var item in METADATA.runes){
+		if(METADATA.runes[item].id == perkStyle){
+			var data2 = METADATA.runes[item].slots;
+			for(var index in data2){
+				var data3 = data2[index].runes;
+				for(var index2 in data3){
+					if(data3[index2].id == perkID){
+						return data3[index2].icon;
 					}
 				}
-			} else {
-				console.log(response.statusCode);
 			}
-			resolve('finished');
-		});
-	})
-
-	return name;
+		}
+	}
+	return "NULL";
 }
 
-async function getPerkStyleName(perkStyle) {
-	var name = "none";
-	var URL = `http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json`;
-	await new Promise(function(resolve, reject){
-		request(URL, function(err, response, body) {
-			if(!err && response.statusCode == 200) {
-				var data = JSON.parse(body);
-				for(var item in data){
-					if(data[item].id == perkStyle){
-						name = data[item].icon;
-						resolve('finished');
-					}
-				}
-			} else {
-				console.log(response.statusCode);
-			}
-			resolve('finished');
-		});
-	})
-
-	return name;
+function getPerkStyleName(perkStyle) {
+	for(var item in METADATA.runes){
+		if(METADATA.runes[item].id == perkStyle){
+			return METADATA.runes[item].icon;
+		}
+	}
+	return "NULL";
 }
 
-async function getSummonerSpellName(spellID) {
-	var name = "none";
-	var URL = `http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/summoner.json`;
-	await new Promise(function(resolve, reject){
-		request(URL, function(err, response, body) {
-			if(!err && response.statusCode == 200) {
-				var data = JSON.parse(body);
-				for(var item in data.data)
-					if(data.data[item].key == spellID) {
-						name = data.data[item].id;
-						resolve('finished');
-					}
-			} else {
-				console.log(response.statusCode);
-			}
-			resolve('finished');
-		});
-	})
-
-	return name;
+function getSummonerSpellName(spellID) {
+	for(var item in METADATA.summoners)
+		if(METADATA.summoners[item].key == spellID) {
+			return METADATA.summoners[item].id;
+		}
 }
 
-async function getItemName(itemID) {
-	var name = "none";
-	var URL = `http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/item.json`;
-	await new Promise(function(resolve, reject){
-		request(URL, function(err, response, body) {
-			if(!err && response.statusCode == 200) {
-				var data = JSON.parse(body);
-				for(var item in data.data){
-					if(item == itemID){
-						name = data.data[item].image.full;
-						resolve('finished');
-					}
-				}
-			} else {
-				console.log(response.statusCode);
-			}
-			resolve('finished');
-		});
-	})
-
-	return name;
+function getItemName(itemID) {
+	for(var item in METADATA.items){
+		if(item == itemID){
+			return METADATA.items[item].image.full;
+		}
+	}
+	return "NULL";
 }
 
-async function getChampionName(championId) {
-	var name = "none";
-	var URL = `http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/champion.json`;
-	await new Promise(function(resolve, reject){
-		request(URL, function(err, response, body) {
+var METADATA = {};
+initMetadata();
+
+function initMetadata(){
+	new Promise(function(resolve, reject){
+		request(`http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/champion.json`, function(err, response, body) {
 			if(!err && response.statusCode == 200) {
-				var champions = JSON.parse(body);
-				for(var item in champions.data){
-					if(champions.data[item].key == championId){
-						name = champions.data[item].id;
-						resolve('finished');
-					}
-				}
+				METADATA.champions = JSON.parse(body).data;
 			} else {
 				console.log(response.statusCode);
 			}
 			resolve('finished');
 		});
 	})
-	return name;
+	new Promise(function(resolve, reject){
+		request(`http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/item.json`, function(err, response, body) {
+			if(!err && response.statusCode == 200) {
+				METADATA.items = JSON.parse(body).data;
+			} else {
+				console.log(response.statusCode);
+			}
+			resolve('finished');
+		});
+	})
+	new Promise(function(resolve, reject){
+		request(`http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/summoner.json`, function(err, response, body) {
+			if(!err && response.statusCode == 200) {
+				METADATA.summoners = JSON.parse(body).data;
+			} else {
+				console.log(response.statusCode);
+			}
+			resolve('finished');
+		});
+	})
+	new Promise(function(resolve, reject){
+		request(`http://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/runesReforged.json`, function(err, response, body) {
+			if(!err && response.statusCode == 200) {
+				METADATA.runes = JSON.parse(body).data;
+			} else {
+				console.log(response.statusCode);
+			}
+			resolve('finished');
+		});
+	})
+}
+
+function getChampionName(championId) {
+	for(var item in METADATA.champions){
+		if(METADATA.champions[item].key == championId){
+			return METADATA.champions[item].id;
+		}
+	}
+	return "NULL";
 }
 
 module.exports = { 
